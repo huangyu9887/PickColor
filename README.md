@@ -71,5 +71,8 @@ const hexColor = result.sRGBHex; // 获取十六进制颜色值
 4. 支持颜色值格式转换（如#fff ↔ #ffffff）；
 5. 替换浮世绘备选配色（藤紫/藤黄），丰富风格选择。
 
+## 网站访问
+- https://huangyu9887.github.io/PickColor
+  
 ## 📄 许可证
 本项目为开源免费工具。
