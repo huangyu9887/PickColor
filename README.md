@@ -1,6 +1,6 @@
 # PickColor
 - Pick Color from screen(PC,Mobile Phone,Tablet)
-# 浮世绘风格屏幕取色工具
+# 屏幕取色工具
 一款基于浏览器原生 `EyeDropper API` 开发的屏幕取色工具，采用日式浮世绘经典配色风格，支持PC/移动端取色、颜色值复制，纯前端实现无需后端依赖。
 
 ## ✨ 功能特点
