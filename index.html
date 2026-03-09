@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简易屏幕取色工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif; /* 替换为更适配国风的字体 */
+        }
+        body {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9f5f0; /* 浮世绘浅米色背景，替代单调浅灰 */
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            text-align: center;
+            border: 1px solid #e8dcc8; /* 浅木纹边框，贴合浮世绘质感 */
+        }
+        h1 {
+            color: #8c2c22; /* 浮世绘柿红色标题 */
+            margin-bottom: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        /* 浮世绘主按钮（藏青+朱红渐变，经典浮世绘配色） */
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #2a4365, #1a365d); /* 浮世绘藏青渐变 */
+            color: #fff8e8; /* 米白文字，对比更和谐 */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(42, 67, 101, 0.3);
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #1a365d, #0f2746); /* hover加深藏青 */
+            transform: translateY(-2px); /* 轻微上浮，增强交互感 */
+        }
+        .color-result {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .color-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            border: 2px solid #e8dcc8; /* 木纹感边框 */
+        }
+        .color-code {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2a4365; /* 藏青文字，贴合主色调 */
+            padding: 10px 20px;
+            background: #f8f2e9; /* 浅米背景 */
+            border-radius: 5px;
+            border: 1px solid #e8dcc8;
+        }
+        /* 浮世绘复制按钮（朱红，浮世绘经典点缀色） */
+        .copy-btn {
+            margin-top: 15px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #e53e3e, #c53030); /* 浮世绘朱红渐变 */
+            color: #fff8e8;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(229, 62, 62, 0.2);
+        }
+        .copy-btn:hover {
+            background: linear-gradient(135deg, #c53030, #a72727); /* hover加深朱红 */
+            transform: translateY(-2px);
+        }
+        .success {
+            color: #c53030; /* 复制成功提示用朱红 */
+            margin-top: 10px;
+            display: none;
+            font-weight: 500;
+        }
+        .tip {
+            margin-top: 20px;
+            color: #6b4c2d; /* 深棕文字，贴合浮世绘复古感 */
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>屏幕取色工具</h1>
+        <button class="btn" id="pickColorBtn">开始取色</button>
+        <div class="color-result">
+            <div class="color-preview" id="colorPreview"></div>
+            <div class="color-code" id="colorCode">——</div>
+        </div>
+        <button class="copy-btn" id="copyBtn">复制颜色值</button>
+        <div class="success" id="successTip">复制成功！</div>
+        <div class="tip">
+            提示：PC端点击按钮后可选择屏幕任意区域取色 | 手机端点击按钮后拍摄画面取色
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const pickColorBtn = document.getElementById('pickColorBtn');
+        const colorPreview = document.getElementById('colorPreview');
+        const colorCode = document.getElementById('colorCode');
+        const copyBtn = document.getElementById('copyBtn');
+        const successTip = document.getElementById('successTip');
+
+        // 核心取色逻辑
+        pickColorBtn.addEventListener('click', async () => {
+            // 检查浏览器是否支持屏幕捕获API
+            if (!window.EyeDropper) {
+                alert('你的浏览器不支持取色功能，请使用Chrome 95+/Edge 95+/Opera 81+等现代浏览器');
+                return;
+            }
+
+            try {
+                const eyeDropper = new EyeDropper();
+                // 唤起取色器
+                const result = await eyeDropper.open();
+                // 获取取色结果（十六进制颜色值）
+                const hexColor = result.sRGBHex;
+                
+                // 更新页面展示
+                colorPreview.style.backgroundColor = hexColor;
+                colorCode.textContent = hexColor;
+            } catch (err) {
+                // 用户取消取色时的提示
+                if (err.name !== 'AbortError') {
+                    alert('取色失败：' + err.message);
+                }
+            }
+        });
+
+        // 复制颜色值功能
+        copyBtn.addEventListener('click', () => {
+            const colorValue = colorCode.textContent;
+            if (colorValue === '——') {
+                alert('请先取色！');
+                return;
+            }
+            // 复制到剪贴板
+            navigator.clipboard.writeText(colorValue).then(() => {
+                successTip.style.display = 'block';
+                // 2秒后隐藏提示
+                setTimeout(() => {
+                    successTip.style.display = 'none';
+                }, 2000);
+            }).catch(() => {
+                alert('复制失败，请手动复制！');
+            });
+        });
+    </script>
+</body>
+</html>
